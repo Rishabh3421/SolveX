@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body{
+    height: 100%;
+    width: 100%;
+}
+.Page1{
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.main{
+    /* background: gray; */
+    width: 50%;
+    height: 100vh;
+    position: relative;
+}
+
+.main .heading{
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 5vh;
+    width: 70%;
+    font-weight: 700;
+    font-family: sans-serif;
+    line-height: 55px;
+    /* background: red; */
+   
+}
+
+.main .prompt{
+    font-size: medium;
+    font-weight: 100;
+    opacity: 60%;
+    margin-top: -10px;
+}
+
+.messageBox{
+    position: absolute;
+    bottom: 3%;
+    /* background: red; */
+    width: 100%;
+    height: 10vh;    
+    /* border: 2px solid black; */
+    margin: 5px;
+}
+.messageBox textarea{
+    /* background: yellow; */
+    width: 100%;  
+    height: auto;
+    border-radius: 30px;
+    font-size: 16px;
+    font-family: sans-serif;
+    border: .5px solid rgb(184, 171, 171);
+    padding: 10px 15px;
+    font-weight: 100;
+}
+
+button{
+  cursor: pointer;
+  position: absolute;
+  top: 11.5vh;
+}
+
+.solution-area{
+    width: 50%;
+    margin-left: 1%;
+}
+
+.editor{
+    width: 100%;  
+    height: auto;
+    border-radius: 30px;
+    font-size: 16px;
+    font-family: sans-serif;
+    border: .5px solid rgb(184, 171, 171);
+    padding: 10px 15px;
+    font-weight: 100;   
+    
+}
+
+.chatHistory{
+    font-size: 20px;
+    margin-top: 2vh;
+    position: relative;
+    top: -85vh;
+}
