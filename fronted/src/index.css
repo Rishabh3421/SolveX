@@ -1,9 +1,77 @@
 @import "tailwindcss";
+@font-face {
+    font-family: dance;
+    src: url("./fonts/Gilroy-Medium.ttf");
+}
+
+.solutionArea::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+}
+
+.solutionArea {
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+.messageBox::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+}
+
+.messageBox {
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+.shine {
+    background: #222 -webkit-gradient(linear, left top, right top, from(#222), to(#222), color-stop(0.5, #fff)) 0 0 no-repeat;
+    -webkit-background-size: 150px;
+    color: rgba(255, 255, 255, 0.3);
+    -webkit-background-clip: text;
+    -webkit-animation-name: shine;
+    -webkit-animation-duration: 5s;
+    -webkit-animation-iteration-count: infinite;
+    text-shadow: 0 0px 0px rgba(0, 0, 0, 0.5);
+  }
+  
+  .chrome {
+    background: #222 -webkit-gradient(linear, left top, right top, from(#222), to(#222), color-stop(0.5, #fff)) 0 0 no-repeat;
+    background-image: -webkit-linear-gradient(-40deg, transparent 0%, transparent 40%, #fff 50%, transparent 60%, transparent 100%);
+    -webkit-background-size: 200px;
+    color: rgba(255, 255, 255, 0.3);
+    -webkit-background-clip: text;
+    -webkit-animation-name: shine;
+    -webkit-animation-duration: 5s;
+    -webkit-animation-iteration-count: infinite;
+    text-shadow: 0 0px 0px rgba(3, 3, 3, 0.5);
+  }
+  
+  @-webkit-keyframes shine {
+    0%, 10% {
+      background-position: -1000px;
+    }
+    20% {
+      background-position: top left;
+    }
+    90% {
+      background-position: top right;
+    }
+    100% {
+      background-position: 1000px;
+    }
+  }
 
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+.heading>h1{
+    font-family: dance;
+    font-size: 3.5rem;
+    line-height: 4rem;
+}
+.historyMsg{
+    font-family: dance;
+    font-size: 1rem;
+    /* line-height: 4rem; */
 }
 
 html, body{
@@ -43,31 +111,31 @@ html, body{
     margin-top: -10px;
 }
 
-.messageBox{
+.input{
+ /* background: red; */
     position: absolute;
-    bottom: 3%;
-    /* background: red; */
     width: 100%;
-    height: 10vh;    
-    /* border: 2px solid black; */
-    margin: 5px;
-}
-.messageBox textarea{
-    /* background: yellow; */
-    width: 100%;  
+    bottom: 0%;
     height: auto;
+    border: 0px;
+}
+.input .textarea{
+    position: relative;
+    /* background: yellow; */
+  
+    /* height: auto; */
     border-radius: 30px;
     font-size: 16px;
     font-family: sans-serif;
-    border: .5px solid rgb(184, 171, 171);
-    padding: 10px 15px;
-    font-weight: 100;
+    /* border: .5px solid rgb(184, 171, 171); */
+    /* padding: 10px 15px; */
+    font-weight: 400;
 }
 
 button{
   cursor: pointer;
-  position: absolute;
-  top: 11.5vh;
+  position: relative;
+  scale: 1.1;
 }
 
 .solution-area{
@@ -75,21 +143,34 @@ button{
     margin-left: 1%;
 }
 
-.editor{
-    width: 100%;  
-    height: auto;
-    border-radius: 30px;
-    font-size: 16px;
-    font-family: sans-serif;
-    border: .5px solid rgb(184, 171, 171);
-    padding: 10px 15px;
-    font-weight: 100;   
-    
+.btn > button{
+    /* background: red; */
+    top: 1%;
 }
 
-.chatHistory{
+
+
+/* .chatHistory{
     font-size: 20px;
     margin-top: 2vh;
     position: relative;
     top: -85vh;
+} */
+
+.copyCode{
+    right: 1%;
+    top: 0.3%;
+}
+
+.solutionArea{
+    font-family: dance;
+    font-size: 1rem;
+    line-height: 4vh;
+    scroll-behavior: smooth;
+}
+
+.editor{
+    position: relative;
+    top: 40%;
+    /* background: red; */
 }
