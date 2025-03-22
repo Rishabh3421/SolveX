@@ -16,10 +16,15 @@
   display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
 }
 
-.messageBox {
-  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
-  scrollbar-width: none; /* Hide scrollbar for Firefox */
+.editor {
+  max-height: 30vh;
+  overflow: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  /* background: red; */
+  position: absolute;
 }
+
 .shine {
     background: #222 -webkit-gradient(linear, left top, right top, from(#222), to(#222), color-stop(0.5, #fff)) 0 0 no-repeat;
     -webkit-background-size: 150px;
@@ -115,21 +120,12 @@ html, body{
  /* background: red; */
     position: absolute;
     width: 100%;
-    bottom: 0%;
+    left: 1%;
+    bottom: 0.3%;
     height: auto;
-    border: 0px;
-}
-.input .textarea{
-    position: relative;
-    /* background: yellow; */
-  
-    /* height: auto; */
-    border-radius: 30px;
-    font-size: 16px;
-    font-family: sans-serif;
-    /* border: .5px solid rgb(184, 171, 171); */
-    /* padding: 10px 15px; */
-    font-weight: 400;
+    border: 1px solid  rgb(113, 108, 108);
+    border-radius: 10px;
+    /* overflow: auto; */
 }
 
 button{
@@ -138,24 +134,28 @@ button{
   scale: 1.1;
 }
 
+.editor::selection{
+  /* background: red; */
+  border: 0px;
+  background: transparent;
+  height: auto;
+  overflow: scroll;
+}
+
 .solution-area{
     width: 50%;
     margin-left: 1%;
 }
 
-.btn > button{
-    /* background: red; */
-    top: 1%;
+.btn{
+  background: #E9E8EB;
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  padding-left: 7px;
 }
 
 
-
-/* .chatHistory{
-    font-size: 20px;
-    margin-top: 2vh;
-    position: relative;
-    top: -85vh;
-} */
 
 .copyCode{
     right: 1%;
@@ -173,4 +173,14 @@ button{
     position: relative;
     top: 40%;
     /* background: red; */
+}
+
+.prose{
+  padding: 10px;
+}
+.historyMsg, .editor, .messageBox {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
 }

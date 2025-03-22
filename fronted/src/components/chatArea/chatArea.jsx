@@ -7,7 +7,7 @@ import "prismjs/components/prism-javascript";
 import axios from "axios";
 
 const Chat = ({ Name, setShowCodeReview }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("Enter or Paste your code here...");
   const [messages, setMessages] = useState([]);
   const [showHeading, setShowHeading] = useState(true);
 
@@ -52,11 +52,11 @@ const Chat = ({ Name, setShowCodeReview }) => {
       )}
 
       {/* Message History */}
-      <div className="messageBox bg-gray-100 text-black text-3xl p-4 rounded-md mb-4 max-h-[90vh] overflow-auto flex flex-col gap-4">
+      <div className="messageBox  bg-gray-100 text-black text-3xl p-4 rounded-md mb-4 max-h-[80vh] overflow-auto flex flex-col gap-4">
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`chatHistory p-4 border border-gray-300 text-3xl rounded-md shadow-sm w-full ${
+            className={`chatHistory bg-red-100 p-4 border border-gray-300 text-3xl rounded-md shadow-sm w-full ${
               msg.role === "user" ? "bg-gray-100 text-black" : "bg-gray-200 text-black"
             }`}
           >
@@ -71,6 +71,7 @@ const Chat = ({ Name, setShowCodeReview }) => {
               }}
               highlight={(code) => Prism.highlight(code, Prism.languages.javascript, "javascript")}
               padding={10}
+              readOnly={false} 
               className="historyMsg rounded-lg  bg-transparent"
             />
           </div>
@@ -78,11 +79,11 @@ const Chat = ({ Name, setShowCodeReview }) => {
       </div>
 
       {/* Input Area */}
-      <div className="input rounded-md border p-3 bg-white shadow-md">
+      <div className="input rounded-md  p-3 bg-white shadow-md">
         <Editor
-          className="w-full border min-h-[100px] max-h-[250px] overflow-auto rounded-lg p-3 selection:bg-transparent selection:text-inherit"
+          className="editor w-full text-xl text-gray-700  min-h-[100px] max-h-[250px] overflow-auto rounded-lg p-3 "
           value={query}
-          onValueChange={setQuery}
+          onValueChange={(newQuery) => setQuery(newQuery)} 
           highlight={(code) => Prism.highlight(code, Prism.languages.javascript, "javascript")}
           padding={10}
           onKeyDown={(e) => {
@@ -95,13 +96,13 @@ const Chat = ({ Name, setShowCodeReview }) => {
 
         {/* Buttons */}
         <div className="flex gap-3 mt-3">
-          <button title="Upload files and more" className="text-gray-500 hover:text-black">
+          <button title="Upload files and more" className="btn left-2 bottom-2 bg-red-200 text-gray-500 hover:text-black">
             <Plus size={20} />
           </button>
-          <button title="Search" className="text-gray-500 hover:text-black">
+          <button title="Search" className="btn left-5 bottom-2 bg-red-200 text-gray-500 hover:text-black">
             <Globe size={20} />
           </button>
-          <button title="Send" className="text-gray-500 left-[90%] hover:text-black" onClick={codeReview}>
+          <button title="Send" className="btn text-gray-500 bottom-2 bg-red-200 left-[85%] rotate-50 hover:text-black" onClick={codeReview}>
             <ArrowUp size={20} />
           </button>
         </div>

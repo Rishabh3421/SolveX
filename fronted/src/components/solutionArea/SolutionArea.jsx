@@ -32,7 +32,7 @@ const SolutionArea = ({ showCodeReview }) => {
         </button>
       </div>
 
-      <div className="solutionArea bg-gray-900 p-4 rounded-lg shadow-md overflow-y-auto max-h-[100vh] ">
+      <div className="solutionArea bg-gray-900 p-6 rounded-lg shadow-md overflow-y-auto max-h-[100vh] ">
         <div className="prose prose-invert">
           <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
             {showCodeReview || "No solution yet"}
