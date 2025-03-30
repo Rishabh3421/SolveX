@@ -1,91 +1,138 @@
-import React, { useState } from "react";
-import { ArrowUp, Globe, Plus } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { ArrowUp, Plus } from "lucide-react";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 import "prismjs/components/prism-javascript";
 import axios from "axios";
+import { supabase } from "../../DB/supabaseClient.js";
 
-const Chat = ({ Name, setShowCodeReview }) => {
+const Chat = ({ session, setShowCodeReview }) => {
   const [query, setQuery] = useState("Enter or Paste your code here...");
   const [messages, setMessages] = useState([]);
   const [showHeading, setShowHeading] = useState(true);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (!session) return;
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from("chats")
+        .select("user_id, role, message, created_at")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: true });
+
+      if (!error && data) {
+        const formatted = data.map((msg) => ({
+          role: msg.role,
+          content: msg.message,
+        }));
+        setMessages(formatted);
+      } else {
+        console.error("Error fetching chats:", error);
+      }
+    };
+
+    fetchMessages();
+  }, [session]);
 
   async function codeReview() {
     if (!query.trim()) return;
 
     try {
+      // Save user message to supabase
+      const { error: insertUserError } = await supabase
+        .from("chats")
+        .insert([{ user_id: session.user.id, role: "user", message: query }]);
+
+      if (insertUserError) throw insertUserError;
+
+      setMessages((prev) => [...prev, { role: "user", content: query }]);
+
+      // ✅ Clear the textarea
+      setQuery("");
+
+      // ✅ Get AI response
       const response = await axios.post(
         "http://localhost:9000/ai/get-review",
         { code: query },
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (typeof setShowCodeReview === "function") {
-        setShowCodeReview(response.data);
-      } else {
-        console.error("setShowCodeReview is not a function");
-      }
+      // ✅ Pass response to SolutionArea via props
+      setShowCodeReview(response.data);
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: "user", content: query }, 
-      ]);
+      // ✅ Save AI response to supabase
+      const { error: insertAiError } = await supabase
+        .from("chats")
+        .insert([
+          { user_id: session.user.id, role: "ai", message: response.data },
+        ]);
 
-      setQuery("");
-      setShowHeading(false);
+      if (insertAiError) throw insertAiError;
     } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
+      console.error("Error during code review:", error.message || error);
     }
   }
 
+  // Extract name from email
+  const extractName = (email) => {
+    const match = email.match(/^[a-zA-Z]+/);
+    return match ? match[0] : "";
+  };
+
   return (
-    <div className="main p-6">
-      {showHeading && (
-        <div className="heading chrome mb-6">
-          <h1 className="text-xl font-semibold">Hi, {Name}</h1>
-          <h1 className="text-lg">What can I help you with?</h1>
-          <p className="prompt shine text-gray-600">
-            Choose a prompt below or write your own to start chatting with Solvex
-          </p>
-        </div>
+    <div className="main">
+      {/* Greeting */}
+      {showHeading && messages.length === 0 && (
+        <div className="heading shine mb-6 ">
+        <h1 className="text-xl font-semibold whitespace-nowrap">
+          Hi, {extractName(session.user.email)}
+        </h1>
+        <h1 className="text-lg whitespace-nowrap">What can I help you with?</h1>
+      </div>
+      
       )}
 
-      {/* Message History */}
-      <div className="messageBox  bg-gray-100 text-black text-3xl p-4 rounded-md mb-4 max-h-[80vh] overflow-auto flex flex-col gap-4">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`chatHistory bg-red-100 p-4 border border-gray-300 text-3xl rounded-md shadow-sm w-full ${
-              msg.role === "user" ? "bg-gray-100 text-black" : "bg-gray-200 text-black"
-            }`}
-          >
-            <Editor
-              value={msg.content}
-              onValueChange={(newCode) => {
-                setMessages((prevMessages) => {
-                  const updatedMessages = [...prevMessages];
-                  updatedMessages[index] = { ...updatedMessages[index], content: newCode };
-                  return updatedMessages;
-                });
-              }}
-              highlight={(code) => Prism.highlight(code, Prism.languages.javascript, "javascript")}
-              padding={10}
-              readOnly={false} 
-              className="historyMsg rounded-lg  bg-transparent"
-            />
-          </div>
-        ))}
+      {/* Only User Chat History */}
+      <div className="messageBox bg-gray-100 text-black text-3xl p-2 rounded-md w-[51vw] h-[80vh] overflow-scroll flex flex-col gap-4">
+        {messages
+          .filter((msg) => msg.role === "user")
+          .map((msg, index) => (
+            <div
+              key={index}
+              className="chatHistory p-2  border border-gray-300 text-3xl rounded-md shadow-sm w-full bg-gray-100 text-black"
+            >
+              <Editor
+                value={msg.content}
+                highlight={(code) =>
+                  Prism.highlight(
+                    code,
+                    Prism.languages.javascript,
+                    "javascript"
+                  )
+                }
+                padding={12}
+                readOnly
+                className="historyMsg rounded-lg bg-transparent"
+              />
+            </div>
+          ))}
+        <div ref={bottomRef}></div>
       </div>
 
-      {/* Input Area */}
-      <div className="input rounded-md  p-3 bg-white shadow-md">
-        <Editor
-          className="editor w-full text-xl text-gray-700  min-h-[100px] max-h-[250px] overflow-auto rounded-lg p-3 "
+      {/* Input */}
+      <div className="input bg-white w-[51%] fixed bottom-0  p-2 rounded shadow-md">
+        <textarea
+          className="editor h-30 w-full border rounded p-2"
           value={query}
-          onValueChange={(newQuery) => setQuery(newQuery)} 
-          highlight={(code) => Prism.highlight(code, Prism.languages.javascript, "javascript")}
-          padding={10}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Enter your code here..."
+          style={{
+            minHeight: "100px",
+            maxHeight: "300px",
+            outline: "none",
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -94,15 +141,22 @@ const Chat = ({ Name, setShowCodeReview }) => {
           }}
         />
 
-        {/* Buttons */}
-        <div className="flex gap-3 mt-3">
-          <button title="Upload files and more" className="btn left-2 bottom-2 bg-red-200 text-gray-500 hover:text-black">
+        <div
+          className="flex items-center justify-between"
+          style={{ padding: "5px 10px" }}
+        >
+          <button
+            title="Upload files and more"
+            className="bg-zinc-900 h-[40px] w-[40px] rounded-full flex items-center justify-center text-gray-500 hover:text-white focus:outline-none focus:ring-0 border-0"
+          >
             <Plus size={20} />
           </button>
-          <button title="Search" className="btn left-5 bottom-2 bg-red-200 text-gray-500 hover:text-black">
-            <Globe size={20} />
-          </button>
-          <button title="Send" className="btn text-gray-500 bottom-2 bg-red-200 left-[85%] rotate-50 hover:text-black" onClick={codeReview}>
+
+          <button
+            title="Send"
+            className="bg-zinc-900 h-[40px] w-[40px] rotate-50 rounded-full flex items-center justify-center text-gray-500 hover:text-white focus:outline-none focus:ring-0 border-0"
+            onClick={codeReview}
+          >
             <ArrowUp size={20} />
           </button>
         </div>

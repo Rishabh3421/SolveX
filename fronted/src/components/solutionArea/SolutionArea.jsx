@@ -1,47 +1,69 @@
-import React, { useState } from 'react';
-import Markdown from "react-markdown";
+import React, { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { FiCopy } from "react-icons/fi";
 import { FaCode } from "react-icons/fa";
 
-const SolutionArea = ({ showCodeReview }) => {
+const SolutionArea = ({ showCodeReview, isLoading }) => {
   const [copyText, setCopyText] = useState("Copy");
+  const [solution, setSolution] = useState("");
+
+  // Load the saved solution from localStorage on component mount
+  useEffect(() => {
+    const savedSolution = localStorage.getItem("savedSolution");
+    if (savedSolution) {
+      setSolution(savedSolution);
+    }
+  }, []);
+
+  // Update solution state and save to localStorage when showCodeReview changes
+  useEffect(() => {
+    if (showCodeReview) {
+      setSolution(showCodeReview);
+      localStorage.setItem("savedSolution", showCodeReview);
+    }
+  }, [showCodeReview]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(showCodeReview);
-    setCopyText("Copied!");
-
-    setTimeout(() => {
-      setCopyText("Copy");
-    }, 2000);
+    if (solution) {
+      navigator.clipboard.writeText(solution);
+      setCopyText("Copied!");
+    
+      setTimeout(() => {
+        setCopyText("Copy");
+      }, 2000);
+    }
   };
 
   return (
-    <div className="solution-area bg-black text-white p-5 rounded-lg shadow-lg border border-gray-700 max-h-screen ">
-      
-      <div className="flex items-center justify-between border-b border-gray-600 pb-2 mb-3">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <FaCode className="text-yellow-400" /> Solution Area
+    <div className="text-white w-[48vw] overflow-hidden rounded-xl leading-9 h-full relative  bg-zinc-900">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-zinc-700 pb-3 px-4">
+        <h2 className="text-2xl font-semibold flex items-center gap-2">
+          <FaCode className="text-yellow-400" /> Solution
         </h2>
         <button
           onClick={copyToClipboard}
-          className="copyCode flex items-center gap-2 bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700 transition"
+          className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 transition px-3 py-1 rounded-lg text-sm"
+          disabled={!solution}
         >
-          <FiCopy className="copyCode" /> {copyText}
+          <FiCopy /> {copyText}
         </button>
       </div>
 
-      <div className="solutionArea bg-gray-900 p-6 rounded-lg shadow-md overflow-y-auto max-h-[100vh] ">
-        <div className="prose prose-invert">
-          <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-            {showCodeReview || "No solution yet"}
-          </Markdown>
-        </div>
+      {/* Solution Content */}
+      <div className="flex-1  overflow-y-auto custom-scrollbar px-4 prose prose-invert max-w-none tracking-wide h-[calc(100%-50px)]">
+        {isLoading ? (
+          <p className="text-gray-400 italic">*Thinking...*</p>
+        ) : (
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            {solution || "Waiting for your code..."}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   );
 };
-
 
 export default SolutionArea;
